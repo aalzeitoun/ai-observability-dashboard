@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Observability & MLOps Dashboard API",
-    version="0.9.0",
+    version="0.10.0",
     lifespan=lifespan,
 )
 
@@ -224,6 +224,12 @@ def build_dashboard_snapshot() -> dict:
         "predictions": fetch_prediction_counts(),
         "timeseries": fetch_metrics_timeseries(limit=50),
         "recent_logs": fetch_inference_logs(limit=10),
+        "drift_report": build_ks_drift_report(
+            profile="all",
+            limit=100,
+            alpha=0.05,
+            min_samples=20,
+        ),
     }
 
 
@@ -254,7 +260,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "ai-observability-backend",
-        "version": "0.9.0",
+        "version": "0.10.0",
     }
 
 
@@ -318,7 +324,7 @@ def get_ks_drift_report(
             status_code=500,
             detail=str(exc),
         ) from exc
-        
+
 @app.post("/inference-logs", response_model=InferenceLogRead, status_code=201)
 def create_inference_log(
     payload: InferenceLogCreate,

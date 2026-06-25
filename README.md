@@ -22,8 +22,8 @@ The project will eventually include:
 
 ## Current Status
 
-Add Kolmogorov–Smirnov drift detection
-Step 9 implements:
+Add KS drift detection to the Vue dashboard
+Step 10 implements:
 
 - FastAPI backend
 - PostgreSQL service
@@ -34,6 +34,7 @@ Step 9 implements:
 - Reference feature summary endpoint
 - Kolmogorov–Smirnov drift detection using SciPy
 - Drift detection API comparing training reference data against production inference logs
+- Drift detection dashboard panel with KS statistic and p-value table
 - scikit-learn Iris model simulator
 - Normal and drifted inference simulation
 - Backend metrics endpoints for latency, confidence, and prediction counts

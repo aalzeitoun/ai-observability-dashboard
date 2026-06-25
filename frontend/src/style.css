@@ -228,6 +228,87 @@ td {
   background: #ffe3e3;
 }
 
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.panel-subtitle {
+  margin: -8px 0 0;
+  color: #667085;
+}
+
+.drift-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.mini-card {
+  padding: 16px;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.mini-card span {
+  display: block;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mini-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.drift-status,
+.drift-badge {
+  display: inline-block;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.drift-status {
+  padding: 9px 13px;
+  white-space: nowrap;
+}
+
+.drift-badge {
+  min-width: 62px;
+  padding: 5px 9px;
+  text-align: center;
+}
+
+.drift-alert {
+  color: #c92a2a;
+  background: #ffe3e3;
+}
+
+.drift-stable {
+  color: #087f5b;
+  background: #d3f9d8;
+}
+
+.warning {
+  margin: 0 0 18px;
+  padding: 14px;
+  border-radius: 12px;
+  color: #8a5a00;
+  background: #fff3bf;
+  font-weight: 700;
+}
+
 @media (max-width: 1000px) {
   .metrics-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -248,6 +329,13 @@ td {
   .actions {
     justify-content: flex-start;
   }
+  .drift-summary-grid {
+  grid-template-columns: repeat(2, 1fr);
+  }
+
+  .panel-header {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 650px) {
@@ -259,5 +347,10 @@ td {
 
   h1 {
     font-size: 34px;
+  }
+  .metrics-grid,
+  .status-row,
+  .drift-summary-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -11,6 +11,7 @@ const summary = ref(null)
 const predictions = ref([])
 const timeseries = ref([])
 const recentLogs = ref([])
+const driftReport = ref(null)
 const errorMessage = ref('')
 const isLoading = ref(false)
 const websocketStatus = ref('connecting')
@@ -40,6 +41,14 @@ function formatDate(value) {
   }
 
   return new Date(value).toLocaleString()
+}
+
+function driftedFeatureCount() {
+  return driftReport.value?.features?.filter((feature) => feature.drift_detected).length ?? 0
+}
+
+function hasInsufficientDriftData() {
+  return driftReport.value?.features?.some((feature) => feature.insufficient_data) ?? true
 }
 
 function destroyCharts() {
@@ -75,6 +84,10 @@ async function applyDashboardSnapshot(payload) {
   timeseries.value = payload.timeseries
   recentLogs.value = payload.recent_logs
 
+  if (payload.drift_report) {
+    driftReport.value = payload.drift_report
+  }
+
   await nextTick()
   renderCharts()
 }
@@ -90,14 +103,16 @@ async function refreshDashboard() {
       summaryResponse,
       predictionsResponse,
       timeseriesResponse,
-      recentLogsResponse
+      recentLogsResponse,
+      driftReportResponse
     ] = await Promise.all([
       fetchJson('/health'),
       fetchJson('/health/db'),
       fetchJson('/metrics/summary'),
       fetchJson('/metrics/predictions'),
       fetchJson('/metrics/timeseries?limit=50'),
-      fetchJson('/inference-logs?limit=10')
+      fetchJson('/inference-logs?limit=10'),
+      fetchJson('/drift/ks?profile=all&limit=100&min_samples=20')
     ])
 
     backendHealth.value = backendHealthResponse
@@ -107,7 +122,8 @@ async function refreshDashboard() {
       summary: summaryResponse,
       predictions: predictionsResponse,
       timeseries: timeseriesResponse,
-      recent_logs: recentLogsResponse
+      recent_logs: recentLogsResponse,
+      drift_report: driftReportResponse
     })
   } catch (error) {
     errorMessage.value = `Dashboard refresh failed: ${error.message}`
@@ -269,7 +285,7 @@ onBeforeUnmount(() => {
         <h1>AI Observability Dashboard</h1>
         <p class="subtitle">
           Monitor inference latency, confidence scores, prediction distribution,
-          and simulated production drift.
+          and statistical data drift using the Kolmogorov–Smirnov test.
         </p>
       </div>
 
@@ -348,6 +364,88 @@ onBeforeUnmount(() => {
         <span>Max Latency</span>
         <strong>{{ formatNumber(summary?.max_latency_ms) }} ms</strong>
       </article>
+    </section>
+
+    <section class="panel drift-panel">
+      <div class="panel-header">
+        <div>
+          <h2>KS Data Drift Detection</h2>
+          <p class="panel-subtitle">
+            Comparing Iris training reference data against the latest production inference logs.
+          </p>
+        </div>
+
+        <span
+          class="drift-status"
+          :class="driftReport?.drift_detected ? 'drift-alert' : 'drift-stable'"
+        >
+          {{ driftReport?.drift_detected ? 'Drift Detected' : 'No Drift Detected' }}
+        </span>
+      </div>
+
+      <section class="drift-summary-grid">
+        <article class="mini-card">
+          <span>Profile</span>
+          <strong>{{ driftReport?.profile || 'all' }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Alpha</span>
+          <strong>{{ driftReport?.alpha ?? 0.05 }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Features Drifted</span>
+          <strong>{{ driftedFeatureCount() }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Min Samples</span>
+          <strong>{{ driftReport?.min_samples ?? 20 }}</strong>
+        </article>
+      </section>
+
+      <p v-if="hasInsufficientDriftData()" class="warning">
+        Some features do not yet have enough production samples for the KS test.
+        Generate more normal or drifted inference logs to complete the report.
+      </p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Status</th>
+              <th>KS Statistic</th>
+              <th>p-value</th>
+              <th>Reference Mean</th>
+              <th>Production Mean</th>
+              <th>Samples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="feature in driftReport?.features || []" :key="feature.feature_name">
+              <td>{{ feature.feature_name }}</td>
+              <td>
+                <span
+                  class="drift-badge"
+                  :class="feature.drift_detected ? 'drift-alert' : 'drift-stable'"
+                >
+                  {{ feature.insufficient_data ? 'waiting' : feature.drift_detected ? 'drift' : 'stable' }}
+                </span>
+              </td>
+              <td>{{ formatNumber(feature.ks_statistic, 6) }}</td>
+              <td>{{ formatNumber(feature.p_value, 6) }}</td>
+              <td>{{ formatNumber(feature.reference_mean, 4) }}</td>
+              <td>{{ formatNumber(feature.production_mean, 4) }}</td>
+              <td>
+                {{ feature.reference_sample_count }} /
+                {{ feature.production_sample_count }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="charts-grid">

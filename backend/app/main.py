@@ -9,9 +9,11 @@ from psycopg.errors import UniqueViolation
 from psycopg.types.json import Jsonb
 
 from app.db import get_db_connection, init_db
+from app.drift import build_ks_drift_report
 from app.model import model_simulator
 from app.reference_data import fetch_reference_summary, seed_reference_data
 from app.schemas import (
+    DriftReport,
     InferenceLogCreate,
     InferenceLogRead,
     MetricPoint,
@@ -48,7 +50,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Observability & MLOps Dashboard API",
-    version="0.8.0",
+    version="0.9.0",
     lifespan=lifespan,
 )
 
@@ -252,7 +254,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "ai-observability-backend",
-        "version": "0.8.0",
+        "version": "0.9.0",
     }
 
 
@@ -295,8 +297,28 @@ def get_reference_data_summary() -> dict:
             status_code=500,
             detail=str(exc),
         ) from exc
-        
 
+@app.get("/drift/ks", response_model=DriftReport)
+def get_ks_drift_report(
+    profile: Literal["all", "manual", "normal", "drift"] = "all",
+    limit: int = Query(default=100, ge=5, le=1000),
+    alpha: float = Query(default=0.05, gt=0, lt=1),
+    min_samples: int = Query(default=20, ge=2, le=200),
+) -> dict:
+    try:
+        return build_ks_drift_report(
+            profile=profile,
+            limit=limit,
+            alpha=alpha,
+            min_samples=min_samples,
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+        
 @app.post("/inference-logs", response_model=InferenceLogRead, status_code=201)
 def create_inference_log(
     payload: InferenceLogCreate,

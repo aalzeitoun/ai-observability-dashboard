@@ -22,8 +22,8 @@ The project will eventually include:
 
 ## Current Status
 
-Store reference training data in PostgreSQL
-Step 8 implements: 
+Add Kolmogorov–Smirnov drift detection
+Step 9 implements:
 
 - FastAPI backend
 - PostgreSQL service
@@ -32,6 +32,8 @@ Step 8 implements:
 - Persistent inference profile tracking: manual, normal, and drift
 - Stored Iris training reference data in PostgreSQL
 - Reference feature summary endpoint
+- Kolmogorov–Smirnov drift detection using SciPy
+- Drift detection API comparing training reference data against production inference logs
 - scikit-learn Iris model simulator
 - Normal and drifted inference simulation
 - Backend metrics endpoints for latency, confidence, and prediction counts

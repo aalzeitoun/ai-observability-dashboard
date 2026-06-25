@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 
 InferenceProfile = Literal["manual", "normal", "drift"]
+DriftProfile = Literal["all", "manual", "normal", "drift"]
 
 
 class InferenceLogCreate(BaseModel):
@@ -78,3 +79,25 @@ class ReferenceDataSummary(BaseModel):
     total_features: int
     total_values: int
     features: list[ReferenceFeatureSummary]
+
+
+class DriftFeatureResult(BaseModel):
+    feature_name: str
+    reference_sample_count: int
+    production_sample_count: int
+    reference_mean: float | None
+    production_mean: float | None
+    ks_statistic: float | None
+    p_value: float | None
+    drift_detected: bool
+    insufficient_data: bool
+
+
+class DriftReport(BaseModel):
+    dataset_name: str
+    profile: DriftProfile
+    production_limit: int
+    alpha: float
+    min_samples: int
+    drift_detected: bool
+    features: list[DriftFeatureResult]

@@ -22,12 +22,13 @@ The project will eventually include:
 
 ## Current Status
 
-Step 6 implements:
+Step 7 implements:
 
 - FastAPI backend
 - PostgreSQL service
 - Health endpoint
 - Inference log storage API
+- Persistent inference profile tracking: manual, normal, and drift
 - scikit-learn Iris model simulator
 - Normal and drifted inference simulation
 - Backend metrics endpoints for latency, confidence, and prediction counts

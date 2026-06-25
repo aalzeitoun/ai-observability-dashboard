@@ -381,6 +381,7 @@ onBeforeUnmount(() => {
           <thead>
             <tr>
               <th>ID</th>
+              <th>Profile</th>
               <th>Model</th>
               <th>Prediction</th>
               <th>Confidence</th>
@@ -391,6 +392,11 @@ onBeforeUnmount(() => {
           <tbody>
             <tr v-for="log in recentLogs" :key="log.id">
               <td>{{ log.id }}</td>
+              <td>
+                <span class="profile-badge" :class="`profile-${log.profile}`">
+                  {{ log.profile }}
+                </span>
+              </td>
               <td>{{ log.model_name }}</td>
               <td>{{ log.prediction }}</td>
               <td>{{ formatNumber(log.confidence, 4) }}</td>

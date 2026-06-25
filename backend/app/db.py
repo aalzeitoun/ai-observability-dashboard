@@ -29,7 +29,7 @@ def get_db_connection() -> Generator[psycopg.Connection, None, None]:
 
 
 def init_db() -> None:
-    create_table_sql = """
+    migration_sql = """
     CREATE TABLE IF NOT EXISTS inference_logs (
         id SERIAL PRIMARY KEY,
         request_id TEXT NOT NULL UNIQUE,
@@ -38,18 +38,39 @@ def init_db() -> None:
         prediction INTEGER NOT NULL,
         confidence DOUBLE PRECISION NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
         latency_ms DOUBLE PRECISION NOT NULL CHECK (latency_ms >= 0),
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        profile TEXT NOT NULL DEFAULT 'manual',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT inference_logs_profile_check CHECK (profile IN ('manual', 'normal', 'drift'))
     );
+
+    ALTER TABLE inference_logs
+    ADD COLUMN IF NOT EXISTS profile TEXT NOT NULL DEFAULT 'manual';
+
+    UPDATE inference_logs
+    SET profile = 'manual'
+    WHERE profile IS NULL;
+
+    DO $$
+    BEGIN
+        ALTER TABLE inference_logs
+        ADD CONSTRAINT inference_logs_profile_check
+        CHECK (profile IN ('manual', 'normal', 'drift'));
+    EXCEPTION
+        WHEN duplicate_object THEN NULL;
+    END $$;
 
     CREATE INDEX IF NOT EXISTS idx_inference_logs_created_at
     ON inference_logs (created_at DESC);
 
     CREATE INDEX IF NOT EXISTS idx_inference_logs_model_name
     ON inference_logs (model_name);
+
+    CREATE INDEX IF NOT EXISTS idx_inference_logs_profile
+    ON inference_logs (profile);
     """
 
     with get_db_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute(create_table_sql)
+            cursor.execute(migration_sql)
 
         connection.commit()

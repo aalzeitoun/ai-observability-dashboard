@@ -202,6 +202,32 @@ td {
   font-size: 14px;
 }
 
+.profile-badge {
+  display: inline-block;
+  min-width: 58px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.profile-manual {
+  color: #364fc7;
+  background: #edf2ff;
+}
+
+.profile-normal {
+  color: #087f5b;
+  background: #d3f9d8;
+}
+
+.profile-drift {
+  color: #c92a2a;
+  background: #ffe3e3;
+}
+
 @media (max-width: 1000px) {
   .metrics-grid {
     grid-template-columns: repeat(3, 1fr);

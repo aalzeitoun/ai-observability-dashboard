@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
+
+
+InferenceProfile = Literal["manual", "normal", "drift"]
 
 
 class InferenceLogCreate(BaseModel):
@@ -11,6 +14,7 @@ class InferenceLogCreate(BaseModel):
     prediction: int
     confidence: float = Field(..., ge=0, le=1)
     latency_ms: float = Field(..., ge=0)
+    profile: InferenceProfile = "manual"
 
 
 class InferenceLogRead(BaseModel):
@@ -21,6 +25,7 @@ class InferenceLogRead(BaseModel):
     prediction: int
     confidence: float
     latency_ms: float
+    profile: InferenceProfile
     created_at: datetime
 
 
@@ -33,7 +38,6 @@ class ModelInfo(BaseModel):
 
 
 class SimulatedInferenceResponse(InferenceLogRead):
-    profile: str
     prediction_label: str
 
 

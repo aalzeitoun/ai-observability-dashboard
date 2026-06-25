@@ -63,3 +63,18 @@ class MetricPoint(BaseModel):
     latency_ms: float
     confidence: float
     prediction: int
+
+
+class ReferenceFeatureSummary(BaseModel):
+    feature_name: str
+    sample_count: int
+    mean_value: float
+    min_value: float
+    max_value: float
+
+
+class ReferenceDataSummary(BaseModel):
+    dataset_name: str
+    total_features: int
+    total_values: int
+    features: list[ReferenceFeatureSummary]

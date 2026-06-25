@@ -67,6 +67,23 @@ def init_db() -> None:
 
     CREATE INDEX IF NOT EXISTS idx_inference_logs_profile
     ON inference_logs (profile);
+
+    CREATE TABLE IF NOT EXISTS reference_feature_values (
+        id SERIAL PRIMARY KEY,
+        dataset_name TEXT NOT NULL,
+        row_index INTEGER NOT NULL,
+        feature_name TEXT NOT NULL,
+        feature_value DOUBLE PRECISION NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT reference_feature_values_unique
+        UNIQUE (dataset_name, row_index, feature_name)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_reference_feature_values_dataset
+    ON reference_feature_values (dataset_name);
+
+    CREATE INDEX IF NOT EXISTS idx_reference_feature_values_feature
+    ON reference_feature_values (feature_name);
     """
 
     with get_db_connection() as connection:

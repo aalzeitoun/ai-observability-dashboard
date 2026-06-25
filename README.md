@@ -22,13 +22,16 @@ The project will eventually include:
 
 ## Current Status
 
-Step 7 implements:
+Store reference training data in PostgreSQL
+Step 8 implements: 
 
 - FastAPI backend
 - PostgreSQL service
 - Health endpoint
 - Inference log storage API
 - Persistent inference profile tracking: manual, normal, and drift
+- Stored Iris training reference data in PostgreSQL
+- Reference feature summary endpoint
 - scikit-learn Iris model simulator
 - Normal and drifted inference simulation
 - Backend metrics endpoints for latency, confidence, and prediction counts

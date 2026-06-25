@@ -10,6 +10,7 @@ from psycopg.types.json import Jsonb
 
 from app.db import get_db_connection, init_db
 from app.model import model_simulator
+from app.reference_data import fetch_reference_summary, seed_reference_data
 from app.schemas import (
     InferenceLogCreate,
     InferenceLogRead,
@@ -17,6 +18,7 @@ from app.schemas import (
     MetricsSummary,
     ModelInfo,
     PredictionCount,
+    ReferenceDataSummary,
     SimulatedInferenceResponse,
 )
 from app.websocket_manager import ConnectionManager
@@ -40,12 +42,13 @@ def round_optional(value: float | None, digits: int = 4) -> float | None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    seed_reference_data()
     yield
 
 
 app = FastAPI(
     title="AI Observability & MLOps Dashboard API",
-    version="0.7.0",
+    version="0.8.0",
     lifespan=lifespan,
 )
 
@@ -249,7 +252,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "ai-observability-backend",
-        "version": "0.7.0",
+        "version": "0.8.0",
     }
 
 
@@ -282,6 +285,17 @@ def database_health() -> dict[str, str | int]:
 def get_model_info() -> dict:
     return model_simulator.info()
 
+@app.get("/reference-data/summary", response_model=ReferenceDataSummary)
+def get_reference_data_summary() -> dict:
+    try:
+        return fetch_reference_summary()
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+        
 
 @app.post("/inference-logs", response_model=InferenceLogRead, status_code=201)
 def create_inference_log(

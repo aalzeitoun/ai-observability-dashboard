@@ -22,8 +22,8 @@ The project will eventually include:
 
 ## Current Status
 
-Add backend alerting logic
-Step 12 implements:
+Add alert panel to the Vue dashboard
+Step 13 implements:
 
 - FastAPI backend
 - PostgreSQL service
@@ -36,6 +36,7 @@ Step 12 implements:
 - Drift detection API comparing training reference data against production inference logs
 - Backend alerting logic for latency, confidence, and drift
 - Current alerts API endpoint
+- Frontend alert panel with critical, warning, and info alert visibility
 - Drift detection dashboard panel with KS statistic and p-value table
 - Batch simulation endpoint for generating normal or drifted traffic
 - scikit-learn Iris model simulator

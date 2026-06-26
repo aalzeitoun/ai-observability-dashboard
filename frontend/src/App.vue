@@ -12,6 +12,7 @@ const predictions = ref([])
 const timeseries = ref([])
 const recentLogs = ref([])
 const driftReport = ref(null)
+const alertsSummary = ref(null)
 const errorMessage = ref('')
 const isLoading = ref(false)
 const websocketStatus = ref('connecting')
@@ -51,6 +52,30 @@ function hasInsufficientDriftData() {
   return driftReport.value?.features?.some((feature) => feature.insufficient_data) ?? true
 }
 
+function alertStatusLabel() {
+  const status = alertsSummary.value?.status || 'ok'
+
+  if (status === 'critical') {
+    return 'Critical'
+  }
+
+  if (status === 'warning') {
+    return 'Warning'
+  }
+
+  if (status === 'info') {
+    return 'Info'
+  }
+
+  return 'OK'
+}
+
+function alertStatusClass() {
+  const status = alertsSummary.value?.status || 'ok'
+
+  return `alert-${status}`
+}
+
 function destroyCharts() {
   if (latencyChart) {
     latencyChart.destroy()
@@ -88,6 +113,10 @@ async function applyDashboardSnapshot(payload) {
     driftReport.value = payload.drift_report
   }
 
+  if (payload.alerts) {
+    alertsSummary.value = payload.alerts
+  }
+
   await nextTick()
   renderCharts()
 }
@@ -104,7 +133,8 @@ async function refreshDashboard() {
       predictionsResponse,
       timeseriesResponse,
       recentLogsResponse,
-      driftReportResponse
+      driftReportResponse,
+      alertsResponse
     ] = await Promise.all([
       fetchJson('/health'),
       fetchJson('/health/db'),
@@ -112,7 +142,8 @@ async function refreshDashboard() {
       fetchJson('/metrics/predictions'),
       fetchJson('/metrics/timeseries?limit=50'),
       fetchJson('/inference-logs?limit=10'),
-      fetchJson('/drift/ks?profile=all&limit=100&min_samples=20')
+      fetchJson('/drift/ks?profile=all&limit=100&min_samples=20'),
+      fetchJson('/alerts/current?limit=100')
     ])
 
     backendHealth.value = backendHealthResponse
@@ -123,7 +154,8 @@ async function refreshDashboard() {
       predictions: predictionsResponse,
       timeseries: timeseriesResponse,
       recent_logs: recentLogsResponse,
-      drift_report: driftReportResponse
+      drift_report: driftReportResponse,
+      alerts: alertsResponse
     })
   } catch (error) {
     errorMessage.value = `Dashboard refresh failed: ${error.message}`
@@ -356,6 +388,13 @@ onBeforeUnmount(() => {
       </article>
 
       <article class="status-card">
+        <span>Alerts</span>
+        <strong :class="alertStatusClass()">
+          {{ alertStatusLabel() }}
+        </strong>
+      </article>
+
+      <article class="status-card">
         <span>Latest Log</span>
         <strong>{{ formatDate(summary?.latest_log_at) }}</strong>
       </article>
@@ -391,6 +430,82 @@ onBeforeUnmount(() => {
         <span>Max Latency</span>
         <strong>{{ formatNumber(summary?.max_latency_ms) }} ms</strong>
       </article>
+    </section>
+
+
+    <section class="panel alert-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Current Monitoring Alerts</h2>
+          <p class="panel-subtitle">
+            Alert rules evaluate recent latency, confidence, and KS drift detection results.
+          </p>
+        </div>
+
+        <span class="alert-status" :class="alertStatusClass()">
+          {{ alertStatusLabel() }}
+        </span>
+      </div>
+
+      <section class="alert-summary-grid">
+        <article class="mini-card">
+          <span>Total Alerts</span>
+          <strong>{{ alertsSummary?.alert_count ?? 0 }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Critical</span>
+          <strong>{{ alertsSummary?.critical_count ?? 0 }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Warnings</span>
+          <strong>{{ alertsSummary?.warning_count ?? 0 }}</strong>
+        </article>
+
+        <article class="mini-card">
+          <span>Info</span>
+          <strong>{{ alertsSummary?.info_count ?? 0 }}</strong>
+        </article>
+      </section>
+
+      <div v-if="alertsSummary?.alerts?.length" class="alerts-list">
+        <article
+          v-for="alert in alertsSummary.alerts"
+          :key="alert.name"
+          class="alert-item"
+          :class="`alert-item-${alert.severity}`"
+        >
+          <div>
+            <strong>{{ alert.name }}</strong>
+            <p>{{ alert.message }}</p>
+          </div>
+
+          <div class="alert-values">
+            <span>Value: {{ formatNumber(alert.metric_value, 4) }}</span>
+            <span>Threshold: {{ formatNumber(alert.threshold, 4) }}</span>
+          </div>
+        </article>
+      </div>
+
+      <p v-else class="success-message">
+        No active alerts. Current monitoring signals are within configured thresholds.
+      </p>
+
+      <div class="thresholds">
+        <span>
+          p95 latency threshold:
+          <strong>{{ formatNumber(alertsSummary?.thresholds?.latency_p95_threshold_ms) }} ms</strong>
+        </span>
+        <span>
+          avg confidence threshold:
+          <strong>{{ formatNumber(alertsSummary?.thresholds?.avg_confidence_threshold, 2) }}</strong>
+        </span>
+        <span>
+          drift alpha:
+          <strong>{{ formatNumber(alertsSummary?.thresholds?.drift_alpha, 2) }}</strong>
+        </span>
+      </div>
     </section>
 
     <section class="panel drift-panel">

@@ -257,6 +257,27 @@ async function simulateInference(profile) {
   }
 }
 
+async function simulateBatch(profile, count) {
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const response = await fetch(`${apiBaseUrl}/simulate-batch?profile=${profile}&count=${count}`, {
+      method: 'POST'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Batch simulation failed with status ${response.status}`)
+    }
+
+    await refreshDashboard()
+  } catch (error) {
+    errorMessage.value = `Batch simulation failed: ${error.message}`
+  } finally {
+    isLoading.value = false
+  }
+}
+
 onMounted(async () => {
   await refreshDashboard()
   connectWebSocket()
@@ -295,6 +316,12 @@ onBeforeUnmount(() => {
         </button>
         <button :disabled="isLoading" class="danger" @click="simulateInference('drift')">
           Simulate Drift
+        </button>
+        <button :disabled="isLoading" class="secondary" @click="simulateBatch('normal', 25)">
+          Batch Normal ×25
+        </button>
+        <button :disabled="isLoading" class="danger-light" @click="simulateBatch('drift', 25)">
+          Batch Drift ×25
         </button>
         <button :disabled="isLoading" class="secondary" @click="refreshDashboard">
           Refresh

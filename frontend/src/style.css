@@ -31,6 +31,12 @@ button.danger {
   background: #e03131;
 }
 
+
+button.danger-light {
+  color: #c92a2a;
+  background: #ffe3e3;
+}
+
 button.secondary {
   color: #172033;
   background: #e9eef8;

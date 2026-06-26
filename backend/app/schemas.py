@@ -42,6 +42,14 @@ class SimulatedInferenceResponse(InferenceLogRead):
     prediction_label: str
 
 
+class BatchSimulationResponse(BaseModel):
+    profile: InferenceProfile
+    requested_count: int
+    inserted_count: int
+    first_log_id: int | None
+    last_log_id: int | None
+
+
 class MetricsSummary(BaseModel):
     total_logs: int
     avg_latency_ms: float | None

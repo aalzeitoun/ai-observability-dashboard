@@ -13,6 +13,7 @@ from app.drift import build_ks_drift_report
 from app.model import model_simulator
 from app.reference_data import fetch_reference_summary, seed_reference_data
 from app.schemas import (
+    BatchSimulationResponse,
     DriftReport,
     InferenceLogCreate,
     InferenceLogRead,
@@ -50,7 +51,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Observability & MLOps Dashboard API",
-    version="0.10.0",
+    version="0.11.0",
     lifespan=lifespan,
 )
 
@@ -260,7 +261,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "ai-observability-backend",
-        "version": "0.10.0",
+        "version": "0.11.0",
     }
 
 
@@ -363,11 +364,7 @@ def list_inference_logs(
         ) from exc
 
 
-@app.post("/simulate-inference", response_model=SimulatedInferenceResponse, status_code=201)
-def simulate_inference(
-    background_tasks: BackgroundTasks,
-    profile: Literal["normal", "drift"] = "normal",
-) -> dict:
+def create_simulated_log(profile: Literal["normal", "drift"]) -> tuple[dict, str]:
     simulated = model_simulator.simulate(profile=profile)
 
     payload = InferenceLogCreate(
@@ -380,13 +377,22 @@ def simulate_inference(
         profile=simulated["profile"],
     )
 
+    inserted_log = insert_inference_log(payload)
+
+    return inserted_log, simulated["prediction_label"]
+
+@app.post("/simulate-inference", response_model=SimulatedInferenceResponse, status_code=201)
+def simulate_inference(
+    background_tasks: BackgroundTasks,
+    profile: Literal["normal", "drift"] = "normal",
+) -> dict:
     try:
-        inserted_log = insert_inference_log(payload)
+        inserted_log, prediction_label = create_simulated_log(profile=profile)
         background_tasks.add_task(broadcast_dashboard_snapshot)
 
         return {
             **inserted_log,
-            "prediction_label": simulated["prediction_label"],
+            "prediction_label": prediction_label,
         }
 
     except Exception as exc:
@@ -396,6 +402,36 @@ def simulate_inference(
         ) from exc
 
 
+@app.post("/simulate-batch", response_model=BatchSimulationResponse, status_code=201)
+def simulate_batch(
+    background_tasks: BackgroundTasks,
+    profile: Literal["normal", "drift"] = "normal",
+    count: int = Query(default=25, ge=1, le=200),
+) -> dict:
+    inserted_ids: list[int] = []
+
+    try:
+        for _ in range(count):
+            inserted_log, _ = create_simulated_log(profile=profile)
+            inserted_ids.append(int(inserted_log["id"]))
+
+        background_tasks.add_task(broadcast_dashboard_snapshot)
+
+        return {
+            "profile": profile,
+            "requested_count": count,
+            "inserted_count": len(inserted_ids),
+            "first_log_id": inserted_ids[0] if inserted_ids else None,
+            "last_log_id": inserted_ids[-1] if inserted_ids else None,
+        }
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+
+    
 @app.get("/metrics/summary", response_model=MetricsSummary)
 def get_metrics_summary() -> dict:
     try:

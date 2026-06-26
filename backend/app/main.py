@@ -8,11 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from psycopg.errors import UniqueViolation
 from psycopg.types.json import Jsonb
 
+from app.alerts import build_current_alerts
 from app.db import get_db_connection, init_db
 from app.drift import build_ks_drift_report
 from app.model import model_simulator
 from app.reference_data import fetch_reference_summary, seed_reference_data
 from app.schemas import (
+    AlertSummary,
     BatchSimulationResponse,
     DriftReport,
     InferenceLogCreate,
@@ -51,7 +53,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Observability & MLOps Dashboard API",
-    version="0.11.0",
+    version="0.12.0",
     lifespan=lifespan,
 )
 
@@ -231,6 +233,7 @@ def build_dashboard_snapshot() -> dict:
             alpha=0.05,
             min_samples=20,
         ),
+        "alerts": build_current_alerts(limit=100),
     }
 
 
@@ -261,7 +264,7 @@ def health() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "ai-observability-backend",
-        "version": "0.11.0",
+        "version": "0.12.0",
     }
 
 
@@ -326,6 +329,32 @@ def get_ks_drift_report(
             detail=str(exc),
         ) from exc
 
+@app.get("/alerts/current", response_model=AlertSummary)
+def get_current_alerts(
+    limit: int = Query(default=100, ge=5, le=1000),
+    latency_p95_threshold_ms: float = Query(default=100.0, gt=0),
+    avg_confidence_threshold: float = Query(default=0.80, gt=0, lt=1),
+    low_confidence_threshold: float = Query(default=0.70, gt=0, lt=1),
+    drift_alpha: float = Query(default=0.05, gt=0, lt=1),
+    drift_min_samples: int = Query(default=20, ge=2, le=200),
+) -> dict:
+    try:
+        return build_current_alerts(
+            limit=limit,
+            latency_p95_threshold_ms=latency_p95_threshold_ms,
+            avg_confidence_threshold=avg_confidence_threshold,
+            low_confidence_threshold=low_confidence_threshold,
+            drift_alpha=drift_alpha,
+            drift_min_samples=drift_min_samples,
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=str(exc),
+        ) from exc
+
+        
 @app.post("/inference-logs", response_model=InferenceLogRead, status_code=201)
 def create_inference_log(
     payload: InferenceLogCreate,
@@ -431,7 +460,7 @@ def simulate_batch(
             detail=str(exc),
         ) from exc
 
-    
+
 @app.get("/metrics/summary", response_model=MetricsSummary)
 def get_metrics_summary() -> dict:
     try:

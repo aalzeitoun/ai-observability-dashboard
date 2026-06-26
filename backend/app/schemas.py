@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 
 InferenceProfile = Literal["manual", "normal", "drift"]
 DriftProfile = Literal["all", "manual", "normal", "drift"]
+AlertSeverity = Literal["info", "warning", "critical"]
+AlertStatus = Literal["ok", "info", "warning", "critical"]
 
 
 class InferenceLogCreate(BaseModel):
@@ -109,3 +111,46 @@ class DriftReport(BaseModel):
     min_samples: int
     drift_detected: bool
     features: list[DriftFeatureResult]
+
+
+class AlertItem(BaseModel):
+    name: str
+    severity: AlertSeverity
+    message: str
+    metric_value: float | int | None
+    threshold: float | int | None
+
+
+class AlertEvaluationWindow(BaseModel):
+    recent_log_limit: int
+    latest_log_at: datetime | None
+
+
+class AlertThresholds(BaseModel):
+    latency_p95_threshold_ms: float
+    avg_confidence_threshold: float
+    low_confidence_threshold: float
+    drift_alpha: float
+    drift_min_samples: int
+
+
+class AlertMetrics(BaseModel):
+    total_logs: int
+    avg_latency_ms: float | None
+    p95_latency_ms: float | None
+    max_latency_ms: float | None
+    avg_confidence: float | None
+    low_confidence_count: int
+    latest_log_at: datetime | None
+
+
+class AlertSummary(BaseModel):
+    status: AlertStatus
+    alert_count: int
+    critical_count: int
+    warning_count: int
+    info_count: int
+    evaluation_window: AlertEvaluationWindow
+    thresholds: AlertThresholds
+    metrics: AlertMetrics
+    alerts: list[AlertItem]

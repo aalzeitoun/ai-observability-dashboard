@@ -22,8 +22,8 @@ The project will eventually include:
 
 ## Current Status
 
-Add batch simulation endpoint
-Step 11 implements:
+Add backend alerting logic
+Step 12 implements:
 
 - FastAPI backend
 - PostgreSQL service
@@ -34,6 +34,8 @@ Step 11 implements:
 - Reference feature summary endpoint
 - Kolmogorov–Smirnov drift detection using SciPy
 - Drift detection API comparing training reference data against production inference logs
+- Backend alerting logic for latency, confidence, and drift
+- Current alerts API endpoint
 - Drift detection dashboard panel with KS statistic and p-value table
 - Batch simulation endpoint for generating normal or drifted traffic
 - scikit-learn Iris model simulator

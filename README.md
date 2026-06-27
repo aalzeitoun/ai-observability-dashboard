@@ -457,3 +457,9 @@ Possible extensions:
 - Add more statistical drift tests
 - Add frontend tests
 - Add GitHub Actions CI
+
+## Copyright
+
+Copyright © 2026 Ahmad Alzeitoun All rights reserved.
+
+This project is provided for portfolio purposes. Unauthorized copying, redistribution, or commercial use of this project without permission is not allowed.

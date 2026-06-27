@@ -336,20 +336,33 @@ td {
   color: #087f5b;
   background: #d3f9d8;
 }
+.alert-ok-top {
+  color: #087f5b;
+}
 
 .alert-info {
   color: #1864ab;
   background: #d0ebff;
 }
+.alert-info-top {
+  color: #1864ab;
+}
+
+
+.alert-info-top {
+  color: #1864ab;
+}
 
 .alert-warning {
   color: #8a5a00;
-  background: #fff3bf;
 }
 
 .alert-critical {
   color: #c92a2a;
   background: #ffe3e3;
+}
+.alert-critical-top {
+  color: #c92a2a;
 }
 
 .alerts-list {

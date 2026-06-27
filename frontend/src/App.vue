@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
 
       <article class="status-card">
         <span>Alerts</span>
-        <strong :class="alertStatusClass()">
+        <strong :class="alertStatusClass() + '-top'">
           {{ alertStatusLabel() }}
         </strong>
       </article>

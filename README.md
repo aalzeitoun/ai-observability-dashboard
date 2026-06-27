@@ -22,8 +22,8 @@ The project will eventually include:
 
 ## Current Status
 
-Add alert panel to the Vue dashboard
-Step 13 implements:
+Add lightweight backend tests
+Step 14 implements:
 
 - FastAPI backend
 - PostgreSQL service
@@ -45,6 +45,7 @@ Step 13 implements:
 - WebSocket endpoint for real-time dashboard updates
 - Vue dashboard with Chart.js visualizations
 - UI controls for simulating normal and drifted inference
+- Lightweight backend test suite with pytest
 - Docker Compose workflow
 
 ## Run Locally

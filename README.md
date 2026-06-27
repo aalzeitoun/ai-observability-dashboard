@@ -55,3 +55,10 @@ Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
+
+## Run Backend Tests
+
+Start the stack:
+
+```bash
+docker compose up --build

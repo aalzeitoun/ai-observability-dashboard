@@ -18,9 +18,35 @@ It supports:
 - Alerting for high latency, low confidence, and detected data drift
 - Batch simulation of normal and drifted production traffic
 
-## CV Description
+## CV / Freelance Project Context
 
-Designed and implemented a monitoring platform for deployed machine learning models, focusing on data drift detection and inference latency monitoring. Implemented statistical drift detection using the Kolmogorov–Smirnov test to identify distribution shifts between training and production datasets. Developed backend services with FastAPI to collect, process, and analyze model inference logs stored in PostgreSQL. Built a real-time dashboard in Vue.js using WebSockets and Chart.js to visualize latency, confidence scores, and drift metrics. Simulated production data drift scenarios to evaluate monitoring effectiveness and validate alerting mechanisms.
+This repository is a public, sanitized portfolio version of an AI observability and MLOps dashboard based on freelance project work.
+
+The public version uses simulated Iris model data and does not include any client data, proprietary business logic, private infrastructure, credentials, or production deployment details.
+
+Suggested CV wording:
+
+> Developed a freelance MLOps observability dashboard for monitoring deployed machine learning models, with a public sanitized demo version available on GitHub.
+
+Longer CV description:
+
+> Designed and implemented a monitoring platform for deployed machine learning models, focusing on data drift detection and inference latency monitoring. Implemented statistical drift detection using the Kolmogorov–Smirnov test to identify distribution shifts between training and production datasets. Developed backend services with FastAPI to collect, process, and analyze model inference logs stored in PostgreSQL. Built a real-time dashboard in Vue.js using WebSockets and Chart.js to visualize latency, confidence scores, and drift metrics. Simulated production data drift scenarios to evaluate monitoring effectiveness and validate alerting mechanisms.
+
+## Public Portfolio Version
+
+This repository is intentionally designed as a lightweight public version suitable for GitHub and portfolio review.
+
+It demonstrates the core technical concepts of the original project:
+
+- Inference logging
+- Latency monitoring
+- Confidence score monitoring
+- WebSocket-based real-time dashboard updates
+- Statistical drift detection
+- Alerting for degraded model behavior
+- Simulated normal and drifted production traffic
+
+No real client data, private datasets, credentials, proprietary code, or organization-specific deployment details are included in this repository.
 
 ## Tech Stack
 
@@ -163,7 +189,7 @@ The frontend displays active alerts with severity levels:
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/aalzeitoun/ai-observability-dashboard.git
 cd ai-observability-dashboard
 ```
 
@@ -429,12 +455,24 @@ The project currently includes:
 - Lightweight backend test suite with pytest
 - Docker Compose workflow
 
-## Limitations
+## Public Version Limitations
 
-This is a portfolio-focused MLOps observability project, not a production-grade monitoring platform.
+This is a portfolio-focused public version of an MLOps observability dashboard, not a production-grade client deployment.
 
-Intentionally excluded to keep the project minimal:
+The repository is intentionally simplified so it can be reviewed, run locally, and understood easily.
 
+Intentionally excluded from this public version:
+
+- Real client data
+- Private datasets
+- Production inference logs
+- Credentials or secrets
+- Proprietary business logic
+- Client-specific model metadata
+- Production deployment configuration
+- Internal dashboards or reporting workflows
+- Organization-specific monitoring integrations
+- Authentication and authorization
 - Kubernetes
 - Kafka
 - Spark
@@ -442,24 +480,47 @@ Intentionally excluded to keep the project minimal:
 - Redis
 - Celery
 - Cloud services
-- Authentication
-- Multi-model registry
 - Distributed tracing
 
-## Future Improvements
+## Private Production Version
 
-Possible extensions:
+The original/private freelance version may include additional production-oriented features that are intentionally not included in this public repository, such as:
 
-- Add user authentication
-- Add model version tracking
+- Client-specific model and dataset metadata
+- Organization-specific alert thresholds
+- Private inference log schemas
+- Authentication and role-based access control
+- Production deployment configuration
+- Internal monitoring integrations
+- Client-specific dashboard views
+- Operational reporting workflows
+- Secure environment and secrets management
+
+## Future Improvements for This Public Version
+
+Possible extensions for the public portfolio version:
+
 - Add configurable alert thresholds from the frontend
+- Add model version tracking with public demo data
 - Add CSV export for inference logs
 - Add more statistical drift tests
 - Add frontend tests
 - Add GitHub Actions CI
+- Add screenshots and a short demo GIF
+- Add a lightweight architecture decision record
 
 ## Copyright
 
 Copyright © 2026 Ahmad Alzeitoun All rights reserved.
 
 This project is provided for portfolio purposes. Unauthorized copying, redistribution, or commercial use of this project without permission is not allowed.
+
+## License and Usage
+
+Copyright © 2026 A Alz. All rights reserved.
+
+This repository is provided for educational, portfolio, and code review purposes.
+
+You may view the source code for evaluation purposes, but you may not copy, redistribute, sublicense, or use it commercially without explicit permission.
+
+This public repository does not include client data, proprietary business logic, private infrastructure details, credentials, or production deployment configuration.

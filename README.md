@@ -18,19 +18,6 @@ It supports:
 - Alerting for high latency, low confidence, and detected data drift
 - Batch simulation of normal and drifted production traffic
 
-## CV / Freelance Project Context
-
-This repository is a public, sanitized portfolio version of an AI observability and MLOps dashboard based on freelance project work.
-
-The public version uses simulated Iris model data and does not include any client data, proprietary business logic, private infrastructure, credentials, or production deployment details.
-
-Suggested CV wording:
-
-> Developed a freelance MLOps observability dashboard for monitoring deployed machine learning models, with a public sanitized demo version available on GitHub.
-
-Longer CV description:
-
-> Designed and implemented a monitoring platform for deployed machine learning models, focusing on data drift detection and inference latency monitoring. Implemented statistical drift detection using the Kolmogorov–Smirnov test to identify distribution shifts between training and production datasets. Developed backend services with FastAPI to collect, process, and analyze model inference logs stored in PostgreSQL. Built a real-time dashboard in Vue.js using WebSockets and Chart.js to visualize latency, confidence scores, and drift metrics. Simulated production data drift scenarios to evaluate monitoring effectiveness and validate alerting mechanisms.
 
 ## Public Portfolio Version
 
@@ -383,32 +370,6 @@ curl "http://localhost:8000/alerts/current?limit=100" | python3 -m json.tool
 
 The alert panel should show active alerts if drift or degraded metrics are detected.
 
-## Screenshots
-
-Add screenshots here before publishing the repository.
-
-Suggested screenshots:
-
-```text
-docs/screenshots/dashboard-overview.png
-docs/screenshots/drift-detection.png
-docs/screenshots/alerts-panel.png
-```
-
-Recommended sections:
-
-### Dashboard Overview
-
-Shows latency, confidence, prediction distribution, and recent logs.
-
-### Drift Detection
-
-Shows KS statistics and p-values for each feature.
-
-### Alerts Panel
-
-Shows critical, warning, and info alerts triggered by monitoring rules.
-
 ## Key Endpoints
 
 | Method | Endpoint | Description |
@@ -509,15 +470,10 @@ Possible extensions for the public portfolio version:
 - Add screenshots and a short demo GIF
 - Add a lightweight architecture decision record
 
-## Copyright
-
-Copyright © 2026 Ahmad Alzeitoun All rights reserved.
-
-This project is provided for portfolio purposes. Unauthorized copying, redistribution, or commercial use of this project without permission is not allowed.
 
 ## License and Usage
 
-Copyright © 2026 A Alz. All rights reserved.
+Copyright © 2026 Alzeitoun.org All rights reserved.
 
 This repository is provided for educational, portfolio, and code review purposes.
 
